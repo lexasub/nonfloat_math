@@ -1,6 +1,6 @@
 #include <cmath>
 
-enum t_arg{t_null, t_fraction, t_sum, t_mul};
+enum t_arg{t_null, t_fraction, t_sum, t_mul, t_int, t_shift};//t_shift >> - << +
 
 class math_something
 {
@@ -10,6 +10,7 @@ class math_something
   t_arg arg_type;//may be add var for size of type?
   math_something();
   math_something(math_something& arg);
+  math_something(int& arg);
   math_something(void *arg, t_arg type, bool _sign = 0); 
   ~math_something();
   void child_destructor();
@@ -18,7 +19,22 @@ class math_something
   int size_type(t_arg type);
   int size_type();
   void ch_sign();
+
   void add_int(int& arg);
+  void add_sum(math_something& a, math_something& b);
+  void add_sub(math_something& a, math_something& b);
+  void add_mul(math_something& a, math_something& b);
+  void add_div(math_something& a, math_something& b);
+  void add_shift(math_something& a, math_something& b, bool direction)
+
+  void push_sum(math_something& arg);
+  void push_sub(math_something& arg);
+  void push_mul(math_something& arg);
+  void push_div(math_something& arg);
+  void push_shift(math_something& arg, bool direction);
+
+  int compare(math_something& arg);
+
 };
 
 class math_sum
@@ -87,7 +103,7 @@ class math
   math& operator -(int arg);
   math& operator *(int arg);
   math& operator /(int arg);
-  math& operator %(int arg);
+  math& operator %(int arg);//пока что забили на его реализацию//но он будет в ядре
 
   math& operator +=(int arg);
   math& operator -=(int arg);
@@ -102,36 +118,32 @@ class math
   math& operator <<=(int arg);
   math& operator >>=(int arg);
 	
-  math& operator ()(int arg);
-  
-  bool operator <(math& expr);
-  bool operator >(math& expr);
-  bool operator ==(math& expr);
-  bool operator !=(math& expr);
-  bool operator <=(math& expr);
-  bool operator >=(math& expr);
+  bool operator <(math& arg);
+  bool operator >(math& arg);
+  bool operator ==(math& arg);
+  bool operator !=(math& arg);
+  bool operator <=(math& arg);
+  bool operator >=(math& arg);
 
-  math& operator +(math& expr);
-  math& operator -(math& expr);
-  math& operator *(math& expr);
-  math& operator /(math& expr);
-  math& operator %(math& expr);
+  math& operator +(math& arg);
+  math& operator -(math& arg);
+  math& operator *(math& arg);
+  math& operator /(math& arg);
+  math& operator %(math& arg);
 
-  math& operator +=(math& expr);
-  math& operator -=(math& expr);
-  math& operator *=(math& expr);
-  math& operator /=(math& expr);
-  math& operator %=(math& expr);
+  math& operator +=(math& arg);
+  math& operator -=(math& arg);
+  math& operator *=(math& arg);
+  math& operator /=(math& arg);
+  math& operator %=(math& arg);
 
-  math& operator =(math& expr);
+  math& operator =(math& arg);
    
-  math& operator >>(math& expr);
-  math& operator <<(math& expr);
-  math& operator <<=(math& expr);
-  math& operator >>=(math& expr);
+  math& operator >>(math& arg);
+  math& operator <<(math& arg);
+  math& operator <<=(math& arg);
+  math& operator >>=(math& arg);
 	
-  math& operator ()(math& expr);
-
   math& operator ++();//++A
   math& operator --();
   math& operator ++(int k);//k - unusable//A++
