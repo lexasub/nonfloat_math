@@ -104,6 +104,20 @@ math& math::operator /(int arg)
   return *tmp;
 }
 
+math& math::operator >>(int arg)
+{
+  math *tmp = new math();
+  tmp->_arg.add_shift(*this, math_something::math_something(arg), 1);
+  return *tmp;
+}
+
+math& math::operator <<(int arg)
+{
+  math *tmp = new math();
+  tmp->_arg,add_shift(*this, math_something::math_something(arg), 0);
+  return *tmp;
+}
+
 math& math::operator +(math& arg)
 {
   math *tmp = new math();
@@ -132,6 +146,20 @@ math& math::operator /(math& arg)
   return *tmp;
 }
 
+math& math::operator >>(math& arg)
+{
+  math *tmp = new math();
+  tmp->_arg.add_shift(_arg, arg, 1);
+  return *tmp;
+}
+
+math& math::operator <<(math& arg)
+{
+  math *tmp = new math();
+  tmp->_arg.add_shift(_arg, arg, 0);
+  return *tmp;
+}
+
 math& math::operator +=(int arg)
 {
   _arg.push_sum(math_something::math_something(arg));
@@ -156,6 +184,18 @@ math& math::operator /=(int arg)
   return *this;
 }
 
+math& math::operator >>=(int arg)
+{
+  _arg.push_shift(math_something::math_something(arg), 1);
+  return *this;
+}
+
+math& math::operator <<=(int arg)
+{
+  _arg.push_shift(math_something::math_something(arg), 0);
+  return *this;
+}
+
 math& math::operator +=(math& arg)
 {
   _arg.push_sum(arg);
@@ -177,6 +217,18 @@ math& math::operator *=(math& arg)
 math& math::operator /=(math& arg)
 {
   _arg.push_div(arg);
+  return *this;
+}
+
+math& math::operator >>=(math& arg)
+{
+  _arg.push_shift(arg, 1);
+  return *this;
+}
+
+math& math::operator <<=(math& arg)
+{
+  _arg.push_shift(arg, 0);
   return *this;
 }
 
