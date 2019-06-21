@@ -1,3 +1,9 @@
+struct math_shift
+{
+  math_something arg1;
+  math_something arg2;// в последствии мы его в int превращаем
+}
+
 math_something::math_something():some(NULL),arg_type(t_null){}
 
 math_something::math_something(math_something& arg)
@@ -12,6 +18,7 @@ math_something::math_something(int& arg)
 {
   add_int(arg);
 }
+
 math_something::math_something(void *arg, t_arg type, bool _sign = 0)
 {
   sign = _sign; 
@@ -39,6 +46,8 @@ void math_something::child_destructor()
     case t_mul:
       ((math_mul*)some)->~math_mul;
       return;
+    case t_shift:
+      ((math_shift*)some)->arg1.~math_fraction;
   }
 }
 
@@ -65,6 +74,18 @@ void math_something::fork_childs()
         some = malloc(sizeof(int);
         *some = *tmp;
         return;
+      case t_shift:
+        math_shift *tmp = (math shift*)some;
+        some = malloc(sizeof(math_shift));
+        math_shift *tmp2 = (math_shift*)some;
+        tmp2->arg2.sign = tmp->arg2.sign;
+        tmp2->arg2.some = tmp->arg2.some;
+        tmp2->arg2.arg_type = tmp->arg2.arg_type;
+        tmp2->arg1.fork_childs();
+        tmp2->arg1.sign = tmp->arg1.sign;
+        tmp2->arg1.some = tmp->arg1.some;
+        tmp2->arg1.arg_type = tmp->arg1.arg_type;
+        tmp2->arg1.fork_childs();
     }
   }
 }
@@ -83,6 +104,8 @@ int math_something::size_type(t_arg type)
       return sizeof(math_fraction);
     case t_int:
       return sizeof(int);
+    case t_shift:
+      return sizeof(math_shift);
   }
 }
 
@@ -132,7 +155,19 @@ void math_something::add_div(math_something& a, math_something& b)
 
 void math_something::add_shift(math_something& a, math_something& b, bool direction=0)//0 <<, 1 >>
 {
-
+  some = malloc(sizeof(math_shift));
+  math_something* tmp = &(((math_shift*)some)->arg1);
+  tmp->sign = a.sign;
+  tmp->some = a.some;
+  tmp->arg_type = a.arg_type;
+  tmp->fork_childs();
+  
+  tmp = &(((math_shift*)some)->arg2);
+  tmp->sign = b.sign;
+  if(direction) tmp->sign = !tmp->sign;
+  tmp->some = b.some;
+  tmp->arg_type = b.arg_type;
+  tmp->fork_childs();
 }
 
 void math_something::push_sum(math_something& arg)
@@ -181,9 +216,25 @@ void math_something::push_div(math_something& arg)
   arg_type = t_fraction;
 }
 
-void math_something::push_shift(math_something& arg, bool direction)
+void math_something::push_shift(math_something& arg, bool direction=0)// 0 << 1>>
 {
-
+  math_shift* tu = malloc(sizeof(math_shift));
+  math_something* tmp = &(tu->arg1);
+  tmp->sign = sign;
+  tmp->some = some;
+  tmp->arg_type = arg_type;
+  //tmp.fork_childs();//таак, форкать тут не надо т к мы берем текущий объект
+  
+  tmp = &(tu->arg2);
+  tmp->sign = arg.sign;
+  if(direction) tmp->sign = !tmp->sign;
+  tmp->some = arg.some;
+  tmp->arg_type = arg.arg_type;
+  tmp->fork_childs();//а тут надо так как это переданный аргумент
+  
+  arg_type = t_shift;
+  some = tu;
+  sign = 0;//сбрасываем знак
 }
 
 /*

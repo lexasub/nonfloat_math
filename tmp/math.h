@@ -34,7 +34,7 @@ class math_something
   void push_shift(math_something& arg, bool direction);
 
   int compare(math_something& arg);
-
+  float eval();//должен вызывать в этом же объекте build который в свою очередь вызывает simply//пока работаем без переменных, так что выдаем float
 };
 
 class math_sum

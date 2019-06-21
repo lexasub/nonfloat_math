@@ -237,4 +237,5 @@ math& operator =(int arg)
   _arg.child_destructor();
   _arg.sign = 0;
   _arg.add_int(arg);
+  return *this;
 }
