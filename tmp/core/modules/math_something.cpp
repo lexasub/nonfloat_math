@@ -251,3 +251,161 @@ int math_something::compare(math_something& arg)
   //3-й способ попробовать вычесть или поделить
   //и тд
 }
+
+/*
+ *вызывает функции упрощения внутри классов
+ *по сути работает только на листочках графа(концах - на них расположены бызовые типы - пока что int)
+ *это упрощение на уровне чисел
+ */
+void math_something::simply()
+{
+  switch(arg_type)
+  {
+    case t_fraction:
+      ((math_fraction*)some)->simply();
+      if((((math_fraction*)some)->div.arg_type == t_int) && ((*((int*)(((math_fraction*)some)->div.some))) == 1))
+      {
+        void *tmp = some;
+        sign = (math_fraction*)tmp->num.sign;
+        arg_type = (math_fraction*)tmp->num.arg_type;
+        some = (math_fraction*)tmp.num.some;
+        fork_childs();
+        (math_fraction*)tmp.~math_fraction();
+      }
+      return;
+    case t_sum:
+      ((math_sum*)some)->simply();
+      if(((math_sum*)some)->n == 1)//если один аргумент то переносим заменяем "текущий" obj на 0-й арг  
+      {
+        sign = ((math_sum*)some)->args[0].sign;
+        arg_type = ((math_sum*)some)->args[0].arg_type;
+        free(((math_sum*)some)->args);
+        void *_some = some;
+        some = ((math_sum*)some)->args[0].some;
+        free(_some);
+      }
+      return;
+    case t_mul:
+      ((math_mul*)some)->simply();
+      if(((math_mul*)some)->n == 1)
+      {
+        sign = ((math_sum*)some)->args[0].sign;
+        arg_type = ((math_sum*)some)->args[0].arg_type;
+        free(((math_sum*)some)->args);
+        void *_some = some;
+        some = ((math_sum*)some)->args[0].some;
+        free(_some);
+      }
+      return;
+    case t_shift:
+      ((math_shift*)some)->arg1.simply();
+      ((math_shift*)some)->arg1.simply();
+  }
+}
+
+/*
+ *разделение по фазам(более медленно но более надежно и тесты наверно проще написать)
+ *эта фаза пытается объеденить аргументы с одноименной функцией (a*b)*c-> a*b*c a*(b/c)->(a*b)/c
+ *
+ */
+void math_something::build_ph0()
+{
+  //simply();
+  switch(arg_type)
+  {
+    case t_fraction:
+      math_fraction *t = (math_fraction*)some
+      math_something* tmp = t->build_ph0();
+      if(tmp)//not null
+      {
+        some = tmp->some;
+        arg_type = tmp->arg_type;
+        if(tmp->sign) sign = !sign;
+        fork_childs();
+        t->~math_fraction();
+        free(t);
+      }
+      return;
+    case t_sum:
+//len'
+    case t_mul:
+      math_mul *t = (math_mul*)some;
+      math_something* tmp = t)build_ph0();
+      if(tmp)
+      {
+        some = tmp->some;
+        arg_type = tmp->arg_type;
+        if(tmp->sign) sign = !sign;
+        fork_childs();
+        t->~math_mul();
+        free(t)
+      }
+  }
+}
+
+bool math_something::ph0_div(math_something& arg)
+{
+  if(arg.arg_type == t_fraction)
+  {
+    math_fraction* _arg = (math_fraction*)(arg.some);
+    switch(arg_type)
+    {
+     case t_fraction:
+        math_fraction* tmp = ((math_fraction*)some);
+        tmp->num.push_mul(_arg->div);
+        tmp->div.push_mul(_arg->num);
+        if(arg.sign) sign = !sign;
+        arg.~math_something();//так, второй арг нам уже не нужен
+        return true;
+      case t_mul:
+        math_mul* tmp = ((math_mul*)some);
+        push_mul(_arg->div);
+        push_div(_arg->num);
+        if(arg.sign) sign = !sign;
+        arg.~math_something();
+        tmp->~math_mul();//push_div поменял some -> осталась выделенная память от старого some
+        free(tmp);
+        return true;
+      case t_int:
+        int* tmp = ((int*)some);
+        push_mul(_arg->div);
+        free(tmp);
+        tmp = (int*)some;
+        push_div(_arg->num);
+        free(tmp);
+        if(arg.sign) sign = !sign;
+        arg.~math_something();
+        return true;
+      default: return false;
+    }
+  }
+  else if((arg.arg_type == t_mul) && (arg_type == t_fraction))
+  { 
+    math_mul* _arg = (math_mul*)(arg.some);
+    math_fraction* tmp = ((math_fraction*)some);
+    tmp->div.push_mul(_arg);
+    if(arg.sign) sign = !sign;
+    arg.~math_something();
+    return true;
+  }
+  return false;
+}
+
+bool math_something::ph0_mul(math_something* args, int n)
+{
+  for(int i = 0; i < n; i++)
+  {
+  //и что тут делать? (кроме вызова build_ph0())
+    args[i].build_ph0();
+  }
+}
+/*
+ *это фаза оптимизаций - эвклид для math_something
+ *
+ *
+ */
+
+void math_something::build_ph1()
+{
+
+}

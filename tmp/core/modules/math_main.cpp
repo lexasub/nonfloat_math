@@ -232,10 +232,42 @@ math& math::operator <<=(math& arg)
   return *this;
 }
 
-math& operator =(int arg)
+math& math::operator =(int arg)
 {
   _arg.child_destructor();
   _arg.sign = 0;
   _arg.add_int(arg);
   return *this;
+}
+
+math& math::simply()
+{
+  _arg.simply();
+  return *this;
+}
+
+math& math::build()
+{
+  _arg.build_ph0();
+  _arg.build_ph1();
+  return *this;
+}
+
+float math::eval()
+{
+  return _arg.eval();
+}
+
+void evklid(int& a, int& b)
+{
+  register int t_a = a, t_b = b, c;
+  while (t_b)
+  {
+    c = t_a % t_b;
+    t_a = t_b;
+    t_b = c;
+  }
+  c = abs(t_a);
+  a /= c;
+  b /= c;
 }

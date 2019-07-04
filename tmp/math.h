@@ -2,6 +2,8 @@
 
 enum t_arg{t_null, t_fraction, t_sum, t_mul, t_int, t_shift};//t_shift >> - << +
 
+void evklid(int& a, int& b);
+
 class math_something
 {
   public:
@@ -25,7 +27,7 @@ class math_something
   void add_sub(math_something& a, math_something& b);
   void add_mul(math_something& a, math_something& b);
   void add_div(math_something& a, math_something& b);
-  void add_shift(math_something& a, math_something& b, bool direction)
+  void add_shift(math_something& a, math_something& b, bool direction);
 
   void push_sum(math_something& arg);
   void push_sub(math_something& arg);
@@ -34,7 +36,14 @@ class math_something
   void push_shift(math_something& arg, bool direction);
 
   int compare(math_something& arg);
+  
+  void simply();
+  void build_ph0();//phase
+  void build_ph1();
   float eval();//должен вызывать в этом же объекте build который в свою очередь вызывает simply//пока работаем без переменных, так что выдаем float
+
+  bool ph0_div(math_something& arg);//true if использовали 2-й аргумент->fraction заменяет себя 1-м аргументом
+  bool ph0_mul(math_something* args, int n);//вызывается не из объекта
 };
 
 class math_sum
@@ -50,6 +59,8 @@ class math_sum
   ~math_sum();
 
   void fork_childs();
+  void simply();
+  math_something* build_ph0();
   math_sum& add(math_something& arg);
   math_sum& sub(math_something& arg);  
 };
@@ -67,6 +78,8 @@ class math_mul
   ~math_mul();
 
   void fork_childs();
+  void simply();
+  math_something* build_ph0();
   math_mul& mul(math_something& arg);
 };
 
@@ -81,6 +94,8 @@ class math_fraction
   ~math_fraction();
 
   void fork_childs();
+  void simply();
+  math_something* build_ph0();
 };
 
 class math
@@ -148,4 +163,8 @@ class math
   math& operator --();
   math& operator ++(int k);//k - unusable//A++
   math& operator --(int k);
+
+  math& simpy();
+  math& build();
+  float eval();
 };

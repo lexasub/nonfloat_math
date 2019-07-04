@@ -40,3 +40,23 @@ void math_fraction::fork_childs()
   num.fork_childs();
   div.fork_childs();
 }
+
+void math_fraction::simply()
+{
+  if((num.arg_type == t_int) && (div.arg_type == t_int))
+    evklid(*(int*)(num.some), *(int*)(div.some));
+  else
+  {
+    num.simply();
+    div.simply();
+    simply();//вдруг они int's стали
+  }
+}
+
+math_something* math_fraction::build_ph0()
+{
+  //simply();
+  if(num.ph0_div(div)) return &num;
+  //тогда текущий эл меняем на ребенка(в num содержится ребенок)но поменять мы не можем по этому возвращаем указатель на ребенка
+  return NULL;
+}
